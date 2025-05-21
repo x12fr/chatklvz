@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Key</title>
+</head>
+<body>
+  <input type="password" id="key" placeholder="Enter Admin Key" />
+  <button onclick="check()">Enter</button>
+
+  <script>
+    function check() {
+      const key = document.getElementById("key").value;
+      if (key === "SECRETKEY123") {
+        window.location.href = "admin.html";
+      } else {
+        alert("Wrong key");
+      }
+    }
+  </script>
+</body>
+</html>
