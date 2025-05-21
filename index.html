@@ -1,18 +1,58 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login - Sharcord</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Sharcord - Login/Register</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="container">
-    <h2>Login</h2>
-    <input id="login-username" placeholder="Username">
-    <input id="login-password" type="password" placeholder="Password">
+<body class="dark">
+  <div class="form-container">
+    <h1>Sharcord</h1>
+    <input type="text" id="username" placeholder="Username (no spaces)" />
+    <input type="password" id="password" placeholder="Password" />
+    <input type="text" id="profilePic" placeholder="Profile Picture URL (optional)" />
+    <input type="text" id="adminKey" placeholder="Admin Key (optional)" />
+    <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
-    <p>Don't have an account? <a href="register.html">Register here</a></p>
+    <p id="message"></p>
   </div>
-  <script src="client.js"></script>
+
+  <script>
+    function register() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const profilePic = document.getElementById("profilePic").value;
+      fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, profilePic }),
+      }).then(res => res.json()).then(data => {
+        document.getElementById("message").innerText = data.message || (data.success ? "Registered!" : "Failed to register.");
+      });
+    }
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const adminKey = document.getElementById("adminKey").value;
+      fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, adminKey }),
+      }).then(res => res.json()).then(data => {
+        if (data.success) {
+          localStorage.setItem("username", username);
+          localStorage.setItem("pfp", data.profilePic || "");
+          if (data.isAdmin) {
+            location.href = "/admin.html";
+          } else {
+            location.href = "/chat.html";
+          }
+        } else {
+          document.getElementById("message").innerText = data.message;
+        }
+      });
+    }
+  </script>
 </body>
 </html>
