@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sharcord - Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark">
+  <div class="form-container">
+    <h1>Admin Panel</h1>
+    <button onclick="broadcast('🔊 This is a global announcement from the Admin!')">Send Global Announcement</button>
+    <button onclick="flash()">Flash All Screens</button>
+    <p>More controls can be added easily.</p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function broadcast(msg) {
+      socket.emit("admin-command", { type: "broadcast", message: msg });
+    }
+
+    function flash() {
+      socket.emit("admin-command", { type: "flash" });
+    }
+  </script>
+</body>
+</html>
