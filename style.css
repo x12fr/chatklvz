@@ -1,27 +1,53 @@
-/* style.css */
 body {
   margin: 0;
-  font-family: sans-serif;
-  background-color: #000;
-  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #111;
+  color: white;
 }
-.container, .header, .chat-box, .input-area {
-  padding: 20px;
+
+body.light {
+  background-color: #f0f0f0;
+  color: black;
 }
-.container input, .input-area input, .input-area button {
-  margin: 5px 0;
-  padding: 10px;
+
+.form-container, .chat-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 2em;
+  border-radius: 10px;
 }
+
+input, button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 0.8em;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+button {
+  background-color: #00bfff;
+  color: white;
+  cursor: pointer;
+}
+
 .chat-box {
+  border: 1px solid gray;
   height: 400px;
   overflow-y: scroll;
-  border: 1px solid #444;
-  margin-bottom: 10px;
+  padding: 1em;
+  margin-bottom: 1em;
+  background-color: #222;
+  border-radius: 8px;
 }
-.dark-mode {
-  background-color: #fff;
-  color: #000;
+
+.input-row {
+  display: flex;
+  gap: 10px;
 }
-.dark-mode .chat-box {
-  border: 1px solid #ccc;
+
+.input-row input {
+  flex-grow: 1;
 }
