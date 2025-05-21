@@ -1,27 +1,23 @@
-<!-- chat.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Sharcord Chat</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Sharcord - Chat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="header">
-    <h1>Sharcord</h1>
-    <button onclick="toggleTheme()">Toggle Theme</button>
-    <button onclick="changeUsername()">Change Username</button>
+<body class="dark">
+  <div class="chat-container">
+    <header>
+      <h2>Sharcord Public Chat</h2>
+      <button onclick="toggleTheme()">Toggle Theme</button>
+    </header>
+    <div id="chatBox" class="chat-box"></div>
+    <div class="input-row">
+      <input type="text" id="msgInput" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
-
-  <div id="messages" class="chat-box"></div>
-
-  <div class="input-area">
-    <input id="message-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
-    <button onclick="sendMessage()">Send</button>
-    <input type="file" id="file-input">
-    <button onclick="sendFile()">Send File</button>
-  </div>
-
+  <script src="/socket.io/socket.io.js"></script>
   <script src="client.js"></script>
 </body>
 </html>
