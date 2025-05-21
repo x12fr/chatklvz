@@ -1,59 +1,59 @@
 const socket = io();
-const username = localStorage.getItem("username");
-const pfp = localStorage.getItem("pfp") || "";
 
-socket.emit("join", username, pfp);
+document.getElementById("chatForm").onsubmit = e => {
+  e.preventDefault();
+  const msg = document.getElementById("message").value;
+  socket.emit("chat", { username, msg, pic: profilePic });
+  document.getElementById("message").value = "";
+};
 
-const chatBox = document.getElementById("chatBox");
-
-socket.on("message", ({ username, pfp, message, file, fileName, fileType }) => {
-  const div = document.createElement("div");
-
-  if (file) {
-    if (fileType.startsWith("image/")) {
-      div.innerHTML = `
-        <img src="${pfp}" width="30" height="30" style="border-radius:50%;vertical-align:middle;margin-right:8px;">
-        <b>${username}</b>: <br><img src="${file}" style="max-width:200px; border-radius: 8px;">`;
-    } else {
-      div.innerHTML = `
-        <img src="${pfp}" width="30" height="30" style="border-radius:50%;vertical-align:middle;margin-right:8px;">
-        <b>${username}</b>: <br><a href="${file}" download="${fileName}">Download ${fileName}</a>`;
-    }
-  } else {
-    div.innerHTML = `<img src="${pfp}" width="30" height="30" style="border-radius:50%;vertical-align:middle;margin-right:8px;"> <b>${username}</b>: ${message}`;
-  }
-
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-});
-
-function sendMessage() {
-  const msg = document.getElementById("msgInput").value;
-  if (!msg.trim()) return;
-  socket.emit("chat", { username, pfp, message: msg });
-  document.getElementById("msgInput").value = "";
-}
-
-function sendFile() {
-  const fileInput = document.getElementById("fileInput");
-  const file = fileInput.files[0];
-  if (!file) return;
-
+document.getElementById("uploadInput").addEventListener("change", () => {
+  const file = document.getElementById("uploadInput").files[0];
   const reader = new FileReader();
   reader.onload = () => {
-    const fileData = {
-      username,
-      pfp,
-      file: reader.result,
-      fileName: file.name,
-      fileType: file.type,
-    };
-    socket.emit("file-upload", fileData);
+    socket.emit("upload", { file: reader.result, name: file.name });
   };
-  reader.readAsDataURL(file); // Encodes file as base64
-}
+  reader.readAsDataURL(file);
+});
 
-function toggleTheme() {
-  document.body.classList.toggle("light");
-  document.body.classList.toggle("dark");
-}
+socket.on("message", data => {
+  const msg = document.createElement("div");
+  msg.innerHTML = `<img src="${data.pic}" class="avatar"> <strong>${data.username}</strong>: ${data.msg}`;
+  document.getElementById("chatBox").appendChild(msg);
+});
+
+socket.on("upload", data => {
+  const item = document.createElement("div");
+  if (data.file.startsWith("data:image")) {
+    item.innerHTML = `<strong>${data.name}</strong><br><img src="${data.file}" class="chat-image">`;
+  } else {
+    item.innerHTML = `<a download="${data.name}" href="${data.file}">${data.name}</a>`;
+  }
+  document.getElementById("chatBox").appendChild(item);
+});
+
+socket.on("announcement", msg => {
+  const banner = document.createElement("div");
+  banner.innerText = msg;
+  banner.className = "announcement";
+  document.body.appendChild(banner);
+  setTimeout(() => banner.remove(), 8000);
+});
+
+socket.on("jumpscare", imgUrl => {
+  const scare = document.createElement("img");
+  scare.src = imgUrl;
+  scare.className = "jumpscare";
+  document.body.appendChild(scare);
+  setTimeout(() => scare.remove(), 4000);
+});
+
+socket.on("strobe", () => {
+  const interval = setInterval(() => {
+    document.body.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+  }, 100);
+  setTimeout(() => {
+    clearInterval(interval);
+    document.body.style.backgroundColor = '';
+  }, 3000);
+});
