@@ -1,28 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Sharcord - Admin</title>
+  <title>Admin Panel</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="dark">
-  <div class="form-container">
-    <h1>Admin Panel</h1>
-    <button onclick="broadcast('🔊 This is a global announcement from the Admin!')">Send Global Announcement</button>
-    <button onclick="flash()">Flash All Screens</button>
-    <p>More controls can be added easily.</p>
-  </div>
+<body>
+  <h2>Admin Panel</h2>
+  <input id="announcementInput" placeholder="Type announcement..." />
+  <button onclick="sendAnnouncement()">Send</button>
+  <br>
+  <input id="jumpscareInput" placeholder="Image URL for jumpscare" />
+  <button onclick="sendJumpscare()">Send Jumpscare</button>
+  <br>
+  <button onclick="sendStrobe()">Activate Strobe</button>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
 
-    function broadcast(msg) {
-      socket.emit("admin-command", { type: "broadcast", message: msg });
+    function sendAnnouncement() {
+      const msg = document.getElementById("announcementInput").value;
+      socket.emit("announcement", msg);
     }
 
-    function flash() {
-      socket.emit("admin-command", { type: "flash" });
+    function sendJumpscare() {
+      const url = document.getElementById("jumpscareInput").value;
+      socket.emit("jumpscare", url);
+    }
+
+    function sendStrobe() {
+      socket.emit("strobe");
     }
   </script>
 </body>
