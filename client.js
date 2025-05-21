@@ -1,82 +1,43 @@
-// client.js
 const socket = io();
+const username = localStorage.getItem("username");
+const pfp = localStorage.getItem("pfp") || "";
 
-let currentUsername = localStorage.getItem('username');
+socket.emit("join", username, pfp);
 
-if (window.location.pathname.includes('chat.html')) {
-  if (!currentUsername) window.location.href = 'index.html';
-  socket.emit('join', currentUsername);
+const chatBox = document.getElementById("chatBox");
 
-  socket.on('message', data => {
-    const div = document.createElement('div');
-    div.textContent = `${data.username}: ${data.message}`;
-    document.getElementById('messages').appendChild(div);
-  });
-}
+socket.on("message", ({ username, pfp, message }) => {
+  const div = document.createElement("div");
+  div.innerHTML = `<img src="${pfp}" width="30" height="30" style="border-radius:50%;vertical-align:middle;margin-right:8px;"> <b>${username}</b>: ${message}`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+});
 
-function login() {
-  const username = document.getElementById('login-username').value;
-  const password = document.getElementById('login-password').value;
-  fetch('/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-  }).then(res => res.json()).then(data => {
-    if (data.success) {
-      localStorage.setItem('username', username);
-      window.location.href = 'chat.html';
-    } else alert(data.message);
-  });
-}
-
-function register() {
-  const username = document.getElementById('register-username').value;
-  const password = document.getElementById('register-password').value;
-  fetch('/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password })
-  }).then(res => res.json()).then(data => {
-    if (data.success) window.location.href = 'index.html';
-    else alert(data.message);
-  });
-}
+socket.on("admin-action", data => {
+  if (data.type === "broadcast") {
+    alert(data.message);
+  }
+  if (data.type === "flash") {
+    document.body.style.transition = "none";
+    let i = 0;
+    const flashColors = ["#f00", "#0f0", "#00f", "#fff"];
+    const flashInterval = setInterval(() => {
+      document.body.style.backgroundColor = flashColors[i++ % flashColors.length];
+      if (i > 10) {
+        clearInterval(flashInterval);
+        document.body.style.backgroundColor = "";
+      }
+    }, 150);
+  }
+});
 
 function sendMessage() {
-  const input = document.getElementById('message-input');
-  const message = input.value;
-  if (!message) return;
-  socket.emit('chat', { username: currentUsername, message });
-  input.value = '';
-}
-
-function sendFile() {
-  const fileInput = document.getElementById('file-input');
-  const file = fileInput.files[0];
-  if (!file) return alert('No file selected');
-  const reader = new FileReader();
-  reader.onload = () => {
-    socket.emit('chat', { username: currentUsername, message: `[File] ${file.name} - ${reader.result}` });
-  };
-  reader.readAsDataURL(file);
+  const msg = document.getElementById("msgInput").value;
+  socket.emit("chat", { username, pfp, message: msg });
+  document.getElementById("msgInput").value = "";
 }
 
 function toggleTheme() {
-  document.body.classList.toggle('dark-mode');
-}
-
-function changeUsername() {
-  const newUsername = prompt('Enter new username (once every 3 days):');
-  const lastChange = localStorage.getItem('lastUsernameChange');
-  if (lastChange && Date.now() - parseInt(lastChange) < 259200000) {
-    alert('You can only change your username every 3 days.');
-    return;
-  }
-  if (newUsername) {
-    localStorage.setItem('username', newUsername);
-    localStorage.setItem('lastUsernameChange', Date.now().toString());
-    currentUsername = newUsername;
-    alert('Username changed. Refreshing...');
-    location.reload();
-  }
+  document.body.classList.toggle("light");
+  document.body.classList.toggle("dark");
 }
